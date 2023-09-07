@@ -8,18 +8,25 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Files\Image\directory-32.png" />
     <None Remove="Files\Image\play-50.png" />
     <None Remove="Files\Image\stop-50.png" />
+    <None Remove="Files\Settings.json" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Files\Image\directory-32.png" />
     <Resource Include="Files\Image\play-50.png" />
     <Resource Include="Files\Image\stop-50.png" />
+    <Resource Include="Files\Settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
 </Project>

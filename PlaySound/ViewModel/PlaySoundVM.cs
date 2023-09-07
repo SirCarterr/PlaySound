@@ -1,4 +1,8 @@
-﻿using System;
+﻿using PlaySound.Model;
+using PlaySound.View;
+using PlaySound.ViewModel.Commands;
+using PlaySound.ViewModel.Helpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,6 +13,18 @@ namespace PlaySound.ViewModel
 {
     public class PlaySoundVM : INotifyPropertyChanged
     {
+        private Settings settings = new();
+
+        public Settings Settings
+        {
+            get { return settings; }
+            set 
+            { 
+                settings = value;
+                OnPropertyChanged(nameof(settings));
+            }
+        }
+
         private string[]? audios;
 
         public string[]? Audios
@@ -22,6 +38,23 @@ namespace PlaySound.ViewModel
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public OpenSettingsCommand OpenSettingsCommand { get; set; }
+
+        public PlaySoundVM()
+        {
+            Settings = SettingsHelper.GetSettings();
+
+            OpenSettingsCommand = new OpenSettingsCommand(this);
+        }
+
+        public void OpenSettingsWindow()
+        {
+            var settingsWindow = new SettingsWindow();
+            bool? result = settingsWindow.ShowDialog();
+            if (result == null)
+                return;
+        }
 
         private void OnPropertyChanged(string propertyName)
         {

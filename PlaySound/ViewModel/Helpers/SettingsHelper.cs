@@ -12,14 +12,36 @@ namespace PlaySound.ViewModel.Helpers
 {
     public static class SettingsHelper
     {
-        public static Settings? GetSettings()
+        public static Settings GetSettings()
         {
-            if(File.Exists(Path.Combine(Environment.CurrentDirectory, "Files", "Settings.json")))
+            Settings? settings;
+            if (File.Exists(Path.Combine(Environment.CurrentDirectory, "settings.json")))
             {
-                return JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "Files", "Settings.json")));
+                settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "settings.json")));
+                if (settings != null)
+                {
+                    return settings;
+                }
+                settings = new Settings() 
+                { 
+                    DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    PlayAudioKey = "+",
+                    StopAudioKey = "-",
+                    NextAudioKey = "right",
+                    PreviousAudioKey = "left",
+                };
+                File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "settings.json"), JsonConvert.SerializeObject(settings));
+                return settings;
             }
-            Settings settings = new() { DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) };
-            using StreamWriter file = File.CreateText(Path.Combine(Environment.CurrentDirectory, "Files", "Settings.json"));
+            settings = new() 
+            {
+                DirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                PlayAudioKey = "+",
+                StopAudioKey = "-",
+                NextAudioKey = "right",
+                PreviousAudioKey = "left",
+            };
+            using StreamWriter file = File.CreateText(Path.Combine(Environment.CurrentDirectory, "settings.json"));
             JsonSerializer serializer = new();
             serializer.Serialize(file, settings);
             return settings;
@@ -27,9 +49,9 @@ namespace PlaySound.ViewModel.Helpers
 
         public static bool UpdateSettings(Settings settings)
         {
-            if (File.Exists(Path.Combine(Environment.CurrentDirectory, "Files", "Settings.json")))
+            if (File.Exists(Path.Combine(Environment.CurrentDirectory, "settings.json")))
             {
-                File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "Files", "Settings.json"), JsonConvert.SerializeObject(settings));
+                File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "settings.json"), JsonConvert.SerializeObject(settings));
                 return true;
             }
             return false;

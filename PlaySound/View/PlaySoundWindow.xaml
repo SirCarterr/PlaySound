@@ -27,7 +27,7 @@
                 <Button Margin="8" BorderThickness="0.5" Background="WhiteSmoke">
                     <TextBlock FontSize="14">Add Sound</TextBlock>
                 </Button>
-                <Button Grid.Column="2" Margin="8" BorderThickness="0.5" Background="WhiteSmoke">
+                <Button Grid.Column="2" Margin="8" BorderThickness="0.5" Background="WhiteSmoke" Command="{Binding OpenSettingsCommand}">
                     <TextBlock FontSize="14">Settings</TextBlock>
                 </Button>
             </Grid>

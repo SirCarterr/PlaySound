@@ -10,9 +10,7 @@ namespace PlaySound.ViewModel.Helpers
 {
     public static class AudioManager
     {
-        private static readonly string path = "";
-
-        public static ResponseModel GetAudios()
+        public static ResponseModel GetAudios(string path)
         {
             if (Directory.Exists(path))
             {
@@ -29,7 +27,7 @@ namespace PlaySound.ViewModel.Helpers
 
                 return new ResponseModel()
                 {
-                    Data = audios.ToArray(),
+                    Data = audios,
                     IsError = false
                 };
             }
