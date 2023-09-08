@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Files\Image\delete-24.png" />
     <None Remove="Files\Image\directory-32.png" />
     <None Remove="Files\Image\play-50.png" />
     <None Remove="Files\Image\stop-50.png" />
@@ -15,12 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Files\Image\delete-24.png" />
     <Resource Include="Files\Image\directory-32.png" />
     <Resource Include="Files\Image\play-50.png" />
     <Resource Include="Files\Image\stop-50.png" />

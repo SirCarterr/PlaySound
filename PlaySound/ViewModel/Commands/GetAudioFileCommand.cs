@@ -7,9 +7,9 @@ using System.Windows.Input;
 
 namespace PlaySound.ViewModel.Commands
 {
-    public class GetDirectoryCommand : ICommand
+    public class GetAudioFileCommand : ICommand
     {
-        private SettingsVM SettingsVM { get; set; }
+        private readonly PlaySoundVM playSoundVM;
 
         public event EventHandler? CanExecuteChanged
         {
@@ -17,9 +17,11 @@ namespace PlaySound.ViewModel.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public GetDirectoryCommand(SettingsVM settingsVM)
+        public GetAudioFileCommand(PlaySoundVM playSoundVM)
         {
-            SettingsVM = settingsVM;
+
+            this.playSoundVM = playSoundVM;
+
         }
 
         public bool CanExecute(object? parameter)
@@ -29,7 +31,7 @@ namespace PlaySound.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            SettingsVM.GetAudioDirectory();
+           playSoundVM.GetAudioFile();
         }
     }
 }

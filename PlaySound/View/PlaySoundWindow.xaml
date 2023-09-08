@@ -6,50 +6,86 @@
         xmlns:local="clr-namespace:PlaySound.View"
         xmlns:vm="clr-namespace:PlaySound.ViewModel"
         mc:Ignorable="d"
-        Title="PlaySound" Height="450" Width="550" Background="Beige" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+        Title="PlaySound" Height="450" Width="600" Background="Beige" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <vm:PlaySoundVM x:Key="vm"/>
+
+        <Style x:Key="li-16">
+            <Setter Property="ItemsControl.FontSize" Value="16"/>
+            <Setter Property="ItemsControl.VerticalAlignment" Value="Center"/>
+            <Setter Property="ItemsControl.Margin" Value="5 0"></Setter>
+        </Style>
     </Window.Resources>
     <Grid DataContext="{StaticResource vm}" Margin="10 10 10 10" Background="Beige">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="50"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <Grid>
+            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Audios}" SelectedValue="{Binding SelectedAudio}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Height="25">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.4*"></ColumnDefinition>
+                                <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                                <ColumnDefinition Width="30"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0" Style="{StaticResource li-16}" IsReadOnly="True"
+                                 Text="{Binding Name}"></TextBox>
+
+                            <ComboBox Grid.Column="1" Style="{StaticResource li-16}"
+                                  ItemsSource="{Binding HotKeys1}" SelectedValue="{Binding SelectedAudio.HotKey1}"
+                                  SelectedItem="{Binding HotKey1}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
+                            <ComboBox Grid.Column="2" Style="{StaticResource li-16}"
+                                  ItemsSource="{Binding HotKeys2}" SelectedValue="{Binding SelectedAudio.HotKey2}"
+                                  SelectedItem="{Binding HotKey2}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
+
+                            <Button Grid.Column="3" VerticalAlignment="Center" Margin="2 0" Background="IndianRed">
+                                <Image Source="../Files/Image/delete-24.png" Width="21"></Image>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
                     <ColumnDefinition Width="0.2*"></ColumnDefinition>
-                    <ColumnDefinition Width="0.6*"></ColumnDefinition>
-                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <Button Margin="8" BorderThickness="0.5" Background="WhiteSmoke">
-                    <TextBlock FontSize="14">Add Sound</TextBlock>
+                <Button Grid.Column="0" BorderThickness="0.5" Margin="10" Background="White">
+                    <Image Source="../Files/Image/play-50.png" Width="20"></Image>
                 </Button>
-                <Button Grid.Column="2" Margin="8" BorderThickness="0.5" Background="WhiteSmoke" Command="{Binding OpenSettingsCommand}">
-                    <TextBlock FontSize="14">Settings</TextBlock>
+                <Button Grid.Column="1" BorderThickness="0.5" Margin="10" Background="White">
+                    <Image Source="../Files/Image/stop-50.png" Width="20"></Image>
+                </Button>
+                <Button Grid.Column="3" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                        Visibility="{Binding IsMainView}" Command="{Binding GetAudioFileCommand}">
+                    <TextBlock FontSize="14">Add</TextBlock>
+                </Button>
+                <Button Grid.Column="3" Margin="8" BorderThickness="0.5" Background="WhiteSmoke" 
+                        Visibility="{Binding IsEditingView}" Command="{Binding CancelEditCommand}">
+                    <TextBlock FontSize="14">Cancel</TextBlock>
+                </Button>
+                <Button Grid.Column="4" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                        Visibility="{Binding IsMainView}" Command="{Binding StartEditCommand}"
+                        CommandParameter="{Binding SelectedAudio}">
+                    <TextBlock FontSize="14">Edit</TextBlock>
+                </Button>
+                <Button Grid.Column="4" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                        Visibility="{Binding IsEditingView}" Command="{Binding FinishEditingCommand}"
+                        CommandParameter="{Binding SelectedAudio}">
+                    <TextBlock FontSize="14">Save</TextBlock>
                 </Button>
             </Grid>
-            <ListBox Grid.Row="1" Margin="10 0" HorizontalContentAlignment="Stretch">
-                <ListBoxItem>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.05*"></ColumnDefinition>
-                            <ColumnDefinition Width="0.05*"></ColumnDefinition>
-                            <ColumnDefinition Width="0.9*"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-
-                        <Button Grid.Column="0" BorderThickness="0" Margin="5 3" Background="LimeGreen">
-                            <Image Source="../Files/Image/play-50.png" Width="15"></Image>
-                        </Button>
-                        <Button Grid.Column="1" BorderThickness="0" Margin="5 3" Background="Goldenrod">
-                            <Image Source="../Files/Image/stop-50.png" Width="15"></Image>
-                        </Button>
-                        <TextBlock Grid.Column="2" Text="Sound" VerticalAlignment="Center" FontSize="14" Padding="10 0"></TextBlock>
-                    </Grid>
-                </ListBoxItem>
-            </ListBox>
         </Grid>
     </Grid>
 </Window>

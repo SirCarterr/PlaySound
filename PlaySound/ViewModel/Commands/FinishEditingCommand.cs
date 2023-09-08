@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PlaySound.Common;
+using PlaySound.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +9,9 @@ using System.Windows.Input;
 
 namespace PlaySound.ViewModel.Commands
 {
-    public class OpenSettingsCommand : ICommand
+    public class FinishEditingCommand : ICommand
     {
-        private PlaySoundVM PlaySoundVM { get; set; }
+        private readonly PlaySoundVM playSoundVM;
 
         public event EventHandler? CanExecuteChanged
         {
@@ -17,9 +19,9 @@ namespace PlaySound.ViewModel.Commands
             remove { CommandManager.RequerySuggested -= value; }
         }
 
-        public OpenSettingsCommand(PlaySoundVM playSoundVM)
+        public FinishEditingCommand(PlaySoundVM playSoundVM)
         {
-            PlaySoundVM = playSoundVM;
+            this.playSoundVM = playSoundVM;
         }
 
         public bool CanExecute(object? parameter)
@@ -29,7 +31,7 @@ namespace PlaySound.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            PlaySoundVM.OpenSettingsWindow();
+            playSoundVM.FinishEditing();
         }
     }
 }
