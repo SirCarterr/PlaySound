@@ -22,9 +22,9 @@ namespace PlaySound.ViewModel.Helpers
             _db.Audios.Load();
         }
 
-        public void AddAudio(Audio audio)
+        public void AddAudio(AudioDTO audio)
         {
-            _db.Audios.Add(audio);
+            _db.Audios.Add(ConvertFromDTO(audio));
             _db.SaveChanges();
         }
 
@@ -39,7 +39,7 @@ namespace PlaySound.ViewModel.Helpers
             return 0;
         }
 
-        public int UpdateAudio(Audio audio)
+        public int UpdateAudio(AudioDTO audio)
         {
             Audio? audio_db = _db.Audios.FirstOrDefault(x => x.Id == audio.Id);
             if (audio_db != null)
@@ -54,19 +54,49 @@ namespace PlaySound.ViewModel.Helpers
             return 0;
         }
 
-        public Audio GetAudio(int id)
+        public AudioDTO GetAudio(int id)
         {
             Audio? audio = _db.Audios.FirstOrDefault(x => x.Id == id);
             if (audio != null)
             {
-                return audio;
+                return ConvertToDTO(audio);
             }
             return new();
         }
 
-        public List<Audio> GetAllAudios()
+        public List<AudioDTO> GetAllAudios()
         {
-            return _db.Audios.ToList();
+            var audios = _db.Audios.ToList();
+            List<AudioDTO> audiosDTOs = new List<AudioDTO>();
+            foreach (var audio in audios)
+            {
+                audiosDTOs.Add(ConvertToDTO(audio));
+            }
+            return audiosDTOs;
+        }
+
+        private AudioDTO ConvertToDTO(Audio audio)
+        {
+            return new()
+            {
+                Id = audio.Id,
+                Path = audio.Path,
+                Name = audio.Name,
+                HotKey1 = audio.HotKey1,
+                HotKey2 = audio.HotKey2,
+            };
+        }
+
+        private Audio ConvertFromDTO(AudioDTO dto)
+        {
+            return new()
+            {
+                Id = dto.Id,
+                Path = dto.Path,
+                Name = dto.Name,
+                HotKey1 = dto.HotKey1,
+                HotKey2 = dto.HotKey2,
+            };
         }
     }
 }

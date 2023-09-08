@@ -20,7 +20,7 @@ namespace PlaySound.ViewModel
         //Class data
         private readonly AudioManager _audioManager;
 
-        public string[] HotKeys1
+        public static string[] HotKeys1
         { 
             get 
             {
@@ -28,7 +28,7 @@ namespace PlaySound.ViewModel
             } 
         }
         
-        public string[] HotKeys2
+        public static string[] HotKeys2
         { 
             get 
             {
@@ -37,17 +37,17 @@ namespace PlaySound.ViewModel
         }
 
         //Binding properties
-        public ObservableCollection<Audio> Audios { get; set; } = new();
+        public ObservableCollection<AudioDTO> Audios { get; set; } = new();
 
-        private Audio selectedAudio = new();
+        private AudioDTO selectedAudio = new();
 
-        public Audio SelectedAudio
+        public AudioDTO SelectedAudio
         {
             get { return selectedAudio; }
             set
             {
                 selectedAudio = value;
-                OnPropertyChanged(nameof(Audio));
+                OnPropertyChanged(nameof(SelectedAudio));
             }
         }
 
@@ -63,19 +63,33 @@ namespace PlaySound.ViewModel
             }
         }
 
+        private Visibility isEditingView = Visibility.Hidden;
+
         public Visibility IsEditingView 
         {
             get 
             {
-                return isEditing ? Visibility.Visible : Visibility.Hidden;
+                return isEditingView;
             } 
+            set
+            {
+                isEditingView = value;
+                OnPropertyChanged(nameof(IsEditingView));
+            }
         }
+
+        private Visibility isMainView = Visibility.Visible;
 
         public Visibility IsMainView
         {
             get
             {
-                return !isEditing ? Visibility.Visible : Visibility.Hidden;
+                return isMainView;
+            }
+            set
+            {
+                isMainView = value;
+                OnPropertyChanged(nameof(IsMainView));
             }
         }
 
@@ -105,7 +119,7 @@ namespace PlaySound.ViewModel
             {
                 if (dialog.FileName.Split('.').Last().Equals("mp3"))
                 {
-                    Audio audio = new()
+                    AudioDTO audio = new()
                     {
                         Path = dialog.FileName,
                         Name = dialog.FileName.Split('\\').Last(),
@@ -128,6 +142,8 @@ namespace PlaySound.ViewModel
         public void StartEditing()
         {
             IsEditing = true;
+            IsEditingView = Visibility.Visible;
+            IsMainView = Visibility.Hidden;
             SelectedAudio.IsEditEnabled = true;
         }
 
@@ -135,8 +151,10 @@ namespace PlaySound.ViewModel
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
+            IsEditingView = Visibility.Hidden;
+            IsMainView = Visibility.Visible;
 
-            Audio audio = new()
+            AudioDTO audio = new()
             {
                 Id = SelectedAudio.Id,
                 Path = SelectedAudio.Path,
@@ -153,11 +171,14 @@ namespace PlaySound.ViewModel
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
+            IsEditingView = Visibility.Hidden;
+            IsMainView = Visibility.Visible;
             UpdateAudiosList();
         }
 
         private void UpdateAudiosList()
         {
+            SelectedAudio = new();
             Audios.Clear();
             var audios = _audioManager.GetAllAudios();
             foreach (var audio in audios)

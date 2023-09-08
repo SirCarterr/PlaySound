@@ -25,7 +25,7 @@ namespace PlaySound.ViewModel.Commands
 
         public bool CanExecute(object? parameter)
         {
-            return (parameter as Audio)?.Id != 0;
+            return parameter != null && (parameter as AudioDTO)?.Id != 0;
         }
 
         public void Execute(object? parameter)

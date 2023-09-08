@@ -23,7 +23,7 @@
                 <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Audios}" SelectedValue="{Binding SelectedAudio}">
+            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Audios}" SelectedItem="{Binding SelectedAudio}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Height="25">
@@ -34,17 +34,17 @@
                                 <ColumnDefinition Width="30"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
 
-                            <TextBox Grid.Column="0" Style="{StaticResource li-16}" IsReadOnly="True"
-                                 Text="{Binding Name}"></TextBox>
+                            <TextBlock Grid.Column="0" Style="{StaticResource li-16}" Text="{Binding Name}"></TextBlock>
 
                             <ComboBox Grid.Column="1" Style="{StaticResource li-16}"
-                                  ItemsSource="{Binding HotKeys1}" SelectedValue="{Binding SelectedAudio.HotKey1}"
+                                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys1}" 
                                   SelectedItem="{Binding HotKey1}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
                             <ComboBox Grid.Column="2" Style="{StaticResource li-16}"
-                                  ItemsSource="{Binding HotKeys2}" SelectedValue="{Binding SelectedAudio.HotKey2}"
+                                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys2}"  
                                   SelectedItem="{Binding HotKey2}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
 
-                            <Button Grid.Column="3" VerticalAlignment="Center" Margin="2 0" Background="IndianRed">
+                            <Button Grid.Column="3" VerticalAlignment="Center" Margin="2 0" Background="IndianRed"
+                                    IsEnabled="{Binding IsEditEnabled}">
                                 <Image Source="../Files/Image/delete-24.png" Width="21"></Image>
                             </Button>
                         </Grid>
