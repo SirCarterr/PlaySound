@@ -20,12 +20,13 @@ namespace PlaySound.ViewModel
     {
         //Class data
         private readonly AudioManager _audioManager;
+        private readonly AudioPlayer _audioPlayer;
 
         public static string[] HotKeys1
         { 
             get 
             {
-                return SD.hotkeys1;
+                return SD.hotkeysDictionary1.Keys.ToArray();
             } 
         }
         
@@ -33,7 +34,7 @@ namespace PlaySound.ViewModel
         { 
             get 
             {
-                return SD.hotkeys2;
+                return SD.hotkeysDictionary2.Keys.ToArray();
             } 
         }
 
@@ -100,12 +101,14 @@ namespace PlaySound.ViewModel
         public FinishEditingCommand FinishEditingCommand { get; set; }
         public CancelEditCommand CancelEditCommand { get; set; }
         public DeleteAudioCommand DeleteAudioCommand { get; set; }
+        public PlayAudioCommand PlayAudioCommand { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public PlaySoundVM()
         {
             _audioManager = new AudioManager();
+            _audioPlayer = new AudioPlayer();
             UpdateAudiosList();
 
             GetAudioFileCommand = new GetAudioFileCommand(this);
@@ -113,6 +116,7 @@ namespace PlaySound.ViewModel
             FinishEditingCommand = new FinishEditingCommand(this);
             CancelEditCommand = new CancelEditCommand(this);
             DeleteAudioCommand = new DeleteAudioCommand(this);
+            PlayAudioCommand = new PlayAudioCommand(this);
         }
 
         public void GetAudioFile()
@@ -136,8 +140,8 @@ namespace PlaySound.ViewModel
                 {
                     Path = dialog.FileName,
                     Name = dialog.FileName.Split('\\').Last(),
-                    HotKey1 = "left ctrl",
-                    HotKey2 = "1",
+                    HotKey1 = System.Windows.Input.ModifierKeys.None,
+                    HotKey2 = System.Windows.Input.Key.None,
                 };
                 _audioManager.AddAudio(audio);
                 UpdateAudiosList();
@@ -158,29 +162,30 @@ namespace PlaySound.ViewModel
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
-            IsEditingView = Visibility.Hidden;
-            IsMainView = Visibility.Visible;
 
             AudioDTO audio = new()
             {
                 Id = SelectedAudio.Id,
                 Path = SelectedAudio.Path,
                 Name = SelectedAudio.Name,
-                HotKey1 = SelectedAudio.HotKey1,
-                HotKey2 = SelectedAudio.HotKey2,
+                StrHotKey1 = SelectedAudio.StrHotKey1,
+                StrHotKey2 = SelectedAudio.StrHotKey2,
             };
 
             _audioManager.UpdateAudio(audio);
             UpdateAudiosList();
+            
+            IsEditingView = Visibility.Hidden;
+            IsMainView = Visibility.Visible;
         }
 
         public void CancelEditing()
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
+            UpdateAudiosList();
             IsEditingView = Visibility.Hidden;
             IsMainView = Visibility.Visible;
-            UpdateAudiosList();
         }
 
         public void DeleteAudio()
@@ -191,10 +196,10 @@ namespace PlaySound.ViewModel
             {
                 SelectedAudio.IsEditEnabled = false;
                 IsEditing = false;
-                IsEditingView = Visibility.Hidden;
-                IsMainView = Visibility.Visible;
                 _audioManager.RemoveAudio(SelectedAudio.Id);
                 UpdateAudiosList();
+                IsEditingView = Visibility.Hidden;
+                IsMainView = Visibility.Visible;
             }
         }
 
@@ -207,6 +212,11 @@ namespace PlaySound.ViewModel
             {
                 Audios.Add(audio);
             }
+        }
+
+        public void PlayAudio(string filePath)
+        {
+            _audioPlayer.Play(filePath);
         }
 
         private void OnPropertyChanged(string propertyName)

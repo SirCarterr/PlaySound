@@ -23,10 +23,19 @@
                 <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Audios}" SelectedItem="{Binding SelectedAudio}">
+            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch"  
+                      ItemsSource="{Binding Audios}" SelectedItem="{Binding SelectedAudio}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Height="25">
+                            <Grid.InputBindings>
+                                <!--<KeyBinding Modifiers="{Binding HotKey1}" Key="{Binding HotKey2}"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.PlayAudioCommnad}"
+                                            CommandParameter="{Binding Path}"></KeyBinding>-->
+                                <KeyBinding Modifiers="Ctrl" Key="NumPad0"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.PlayAudioCommand}"
+                                            CommandParameter="{Binding Path}"></KeyBinding>
+                            </Grid.InputBindings>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.4*"></ColumnDefinition>
                                 <ColumnDefinition Width="0.2*"></ColumnDefinition>
@@ -38,10 +47,10 @@
 
                             <ComboBox Grid.Column="1" Style="{StaticResource li-16}"
                                   ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys1}" 
-                                  SelectedItem="{Binding HotKey1}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
+                                  SelectedItem="{Binding StrHotKey1}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
                             <ComboBox Grid.Column="2" Style="{StaticResource li-16}"
                                   ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys2}"  
-                                  SelectedItem="{Binding HotKey2}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
+                                  SelectedItem="{Binding StrHotKey2}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
 
                             <Button Grid.Column="3" VerticalAlignment="Center" Margin="2 0" Background="IndianRed"
                                     IsEnabled="{Binding IsEditEnabled}"
@@ -57,31 +66,29 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.05*"></ColumnDefinition>
                     <ColumnDefinition Width="0.05*"></ColumnDefinition>
-                    <ColumnDefinition Width="0.2*"></ColumnDefinition>
-                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
-                    <ColumnDefinition Width="0.05*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.3*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" BorderThickness="0.5" Margin="10" Background="White">
+                <!--<Button Grid.Column="0" BorderThickness="0.5" Margin="10" Background="White">
                     <Image Source="../Files/Image/play-50.png" Width="20"></Image>
                 </Button>
                 <Button Grid.Column="1" BorderThickness="0.5" Margin="10" Background="White">
                     <Image Source="../Files/Image/stop-50.png" Width="20"></Image>
-                </Button>
-                <Button Grid.Column="3" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                </Button>-->
+                <Button Grid.Column="0" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
                         Visibility="{Binding IsMainView}" Command="{Binding GetAudioFileCommand}">
                     <TextBlock FontSize="14">Add</TextBlock>
                 </Button>
-                <Button Grid.Column="3" Margin="8" BorderThickness="0.5" Background="WhiteSmoke" 
+                <Button Grid.Column="0" Margin="8" BorderThickness="0.5" Background="WhiteSmoke" 
                         Visibility="{Binding IsEditingView}" Command="{Binding CancelEditCommand}">
                     <TextBlock FontSize="14">Cancel</TextBlock>
                 </Button>
-                <Button Grid.Column="4" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                <Button Grid.Column="1" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
                         Visibility="{Binding IsMainView}" Command="{Binding StartEditCommand}"
                         CommandParameter="{Binding SelectedAudio}">
                     <TextBlock FontSize="14">Edit</TextBlock>
                 </Button>
-                <Button Grid.Column="4" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
+                <Button Grid.Column="1" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
                         Visibility="{Binding IsEditingView}" Command="{Binding FinishEditingCommand}"
                         CommandParameter="{Binding SelectedAudio}">
                     <TextBlock FontSize="14">Save</TextBlock>

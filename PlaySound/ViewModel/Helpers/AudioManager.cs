@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using PlaySound.Common;
 using PlaySound.Model;
 using PlaySound.ViewModel.Data;
 using System;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace PlaySound.ViewModel.Helpers
 {
@@ -46,8 +48,8 @@ namespace PlaySound.ViewModel.Helpers
             {
                 audio_db.Path = audio.Path;
                 audio_db.Name = audio.Name;
-                audio_db.HotKey1 = audio.HotKey1;
-                audio_db.HotKey2 = audio.HotKey2;
+                audio_db.HotKey1 = audio.StrHotKey1;
+                audio_db.HotKey2 = audio.StrHotKey2;
                 _db.Audios.Update(audio_db);
                 return _db.SaveChanges();
             }
@@ -82,8 +84,10 @@ namespace PlaySound.ViewModel.Helpers
                 Id = audio.Id,
                 Path = audio.Path,
                 Name = audio.Name,
-                HotKey1 = audio.HotKey1,
-                HotKey2 = audio.HotKey2,
+                HotKey1 = SD.hotkeysDictionary1.ContainsKey(audio.HotKey1) ? SD.hotkeysDictionary1[audio.HotKey1] : ModifierKeys.None,
+                HotKey2 = SD.hotkeysDictionary2.ContainsKey(audio.HotKey2) ? SD.hotkeysDictionary2[audio.HotKey2] : Key.None,
+                StrHotKey1 = audio.HotKey1,
+                StrHotKey2 = audio.HotKey2,
             };
         }
 
@@ -94,8 +98,8 @@ namespace PlaySound.ViewModel.Helpers
                 Id = dto.Id,
                 Path = dto.Path,
                 Name = dto.Name,
-                HotKey1 = dto.HotKey1,
-                HotKey2 = dto.HotKey2,
+                HotKey1 = dto.StrHotKey1,
+                HotKey2 = dto.StrHotKey2,
             };
         }
     }
