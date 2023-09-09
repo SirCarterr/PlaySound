@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -98,6 +99,7 @@ namespace PlaySound.ViewModel
         public StartEditCommand StartEditCommand { get; set; }
         public FinishEditingCommand FinishEditingCommand { get; set; }
         public CancelEditCommand CancelEditCommand { get; set; }
+        public DeleteAudioCommand DeleteAudioCommand { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -110,6 +112,7 @@ namespace PlaySound.ViewModel
             StartEditCommand = new StartEditCommand(this);
             FinishEditingCommand = new FinishEditingCommand(this);
             CancelEditCommand = new CancelEditCommand(this);
+            DeleteAudioCommand = new DeleteAudioCommand(this);
         }
 
         public void GetAudioFile()
@@ -117,23 +120,27 @@ namespace PlaySound.ViewModel
             var dialog = new CommonOpenFileDialog();
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                if (dialog.FileName.Split('.').Last().Equals("mp3"))
+                FileInfo fileInfo = new(dialog.FileName);
+                if (fileInfo.Extension != ".mp3")
                 {
-                    AudioDTO audio = new()
-                    {
-                        Path = dialog.FileName,
-                        Name = dialog.FileName.Split('\\').Last(),
-                        HotKey1 = "left ctrl",
-                        HotKey2 = "1",
-                    };
-                    _audioManager.AddAudio(audio);
-                    UpdateAudiosList();
-                    //_audioManager.RemoveAudio(1);
+                    MessageBox.Show("Invalid file extension!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
-                else
+                if(fileInfo.Length > 3000000)
                 {
-                    MessageBox.Show("Invalid file extension", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Chosen file size exceed 3Mb!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
+
+                AudioDTO audio = new()
+                {
+                    Path = dialog.FileName,
+                    Name = dialog.FileName.Split('\\').Last(),
+                    HotKey1 = "left ctrl",
+                    HotKey2 = "1",
+                };
+                _audioManager.AddAudio(audio);
+                UpdateAudiosList();
             }
             //var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => !w.IsActive && w.Name.Equals("SettingsPlaySound"));
             //window?.Focus();
@@ -174,6 +181,21 @@ namespace PlaySound.ViewModel
             IsEditingView = Visibility.Hidden;
             IsMainView = Visibility.Visible;
             UpdateAudiosList();
+        }
+
+        public void DeleteAudio()
+        {
+            var Result = MessageBox.Show("Do you want to remove this audio?", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if(Result == MessageBoxResult.Yes)
+            {
+                SelectedAudio.IsEditEnabled = false;
+                IsEditing = false;
+                IsEditingView = Visibility.Hidden;
+                IsMainView = Visibility.Visible;
+                _audioManager.RemoveAudio(SelectedAudio.Id);
+                UpdateAudiosList();
+            }
         }
 
         private void UpdateAudiosList()
