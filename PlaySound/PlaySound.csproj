@@ -9,9 +9,7 @@
 
   <ItemGroup>
     <None Remove="Files\Image\delete-24.png" />
-    <None Remove="Files\Image\directory-32.png" />
-    <None Remove="Files\Image\play-50.png" />
-    <None Remove="Files\Image\stop-50.png" />
+    <None Remove="Files\Image\volume-24.png" />
     <None Remove="Files\Settings.json" />
   </ItemGroup>
 
@@ -25,9 +23,7 @@
 
   <ItemGroup>
     <Resource Include="Files\Image\delete-24.png" />
-    <Resource Include="Files\Image\directory-32.png" />
-    <Resource Include="Files\Image\play-50.png" />
-    <Resource Include="Files\Image\stop-50.png" />
+    <Resource Include="Files\Image\volume-24.png" />
     <Resource Include="Files\Settings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

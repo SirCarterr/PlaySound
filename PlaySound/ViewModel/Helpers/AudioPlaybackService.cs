@@ -41,12 +41,6 @@ namespace PlaySound.ViewModel.Helpers
             outputDeviceDefault.Play();
         }
 
-        //public void PlaySound(string fileName)
-        //{
-        //    var input = new Mp3FileReader(fileName);
-        //    AddMixerInput(new AutoDisposeFileReader(input));
-        //}
-
         private IWaveProvider ConvertToRightChannelCount(IWaveProvider input)
         {
             if (input.WaveFormat.Channels == mixerVB.WaveFormat.Channels)
@@ -62,11 +56,13 @@ namespace PlaySound.ViewModel.Helpers
 
         public void PlaySoundVB(CachedSound sound)
         {
+            outputDeviceVB.Volume = sound.Volume;
             AddMixerInputVB(new CachedSoundWaveProvider(sound));
         }
 
         public void PlaySoundDefault(CachedSound sound)
         {
+            outputDeviceDefault.Volume = sound.Volume;
             AddMixerInputDefault(new CachedSoundWaveProvider(sound));
         }
 

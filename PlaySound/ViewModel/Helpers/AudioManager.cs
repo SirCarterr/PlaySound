@@ -50,6 +50,7 @@ namespace PlaySound.ViewModel.Helpers
                 audio_db.Name = audio.Name;
                 audio_db.HotKey1 = audio.StrHotKey1;
                 audio_db.HotKey2 = audio.StrHotKey2;
+                audio_db.Volume = audio.Volume;
                 _db.Audios.Update(audio_db);
                 return _db.SaveChanges();
             }
@@ -84,6 +85,7 @@ namespace PlaySound.ViewModel.Helpers
                 Id = audio.Id,
                 Path = audio.Path,
                 Name = audio.Name,
+                Volume = audio.Volume,
                 HotKey1 = SD.hotkeysDictionary1.ContainsKey(audio.HotKey1) ? SD.hotkeysDictionary1[audio.HotKey1] : ModifierKeys.None,
                 HotKey2 = SD.hotkeysDictionary2.ContainsKey(audio.HotKey2) ? SD.hotkeysDictionary2[audio.HotKey2] : Key.None,
                 StrHotKey1 = audio.HotKey1,
@@ -98,6 +100,7 @@ namespace PlaySound.ViewModel.Helpers
                 Id = dto.Id,
                 Path = dto.Path,
                 Name = dto.Name,
+                Volume= dto.Volume,
                 HotKey1 = dto.StrHotKey1,
                 HotKey2 = dto.StrHotKey2,
             };

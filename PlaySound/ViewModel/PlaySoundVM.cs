@@ -145,6 +145,7 @@ namespace PlaySound.ViewModel
                     Name = dialog.FileName.Split('\\').Last(),
                     StrHotKey1 = "None",
                     StrHotKey2 = "None",
+                    Volume = 1.0f
                 };
                 _audioManager.AddAudio(audio);
                 UpdateAudiosList();
@@ -171,6 +172,7 @@ namespace PlaySound.ViewModel
                 Name = SelectedAudio.Name,
                 StrHotKey1 = SelectedAudio.StrHotKey1,
                 StrHotKey2 = SelectedAudio.StrHotKey2,
+                Volume = SelectedAudio.Volume
             };
 
             _audioManager.UpdateAudio(audio);
@@ -218,8 +220,8 @@ namespace PlaySound.ViewModel
                     continue;
 
                 Audios.Add(audio);
-                _soundsVB.Add(new CachedSound(audio.Id, audio.Path));
-                _soundsDefault.Add(new CachedSound(audio.Id, audio.Path));
+                _soundsVB.Add(new CachedSound(audio.Id, audio.Volume, audio.Path));
+                _soundsDefault.Add(new CachedSound(audio.Id, audio.Volume, audio.Path));
                 _globalHotKeyService.RegisterHotkey(audio.HotKey1, audio.HotKey2, () => PlayAudio(audio.Id));
             }
         }

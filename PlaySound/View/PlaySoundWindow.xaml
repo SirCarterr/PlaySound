@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PlaySound.View"
         xmlns:vm="clr-namespace:PlaySound.ViewModel"
         mc:Ignorable="d"
-        Title="PlaySound" Height="450" Width="600" Background="Beige" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+        Title="PlaySound" Height="450" Width="700" Background="Beige" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <vm:PlaySoundVM x:Key="vm"/>
 
@@ -34,7 +34,9 @@
                                             CommandParameter="{Binding Path}"></KeyBinding>
                             </Grid.InputBindings>-->
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="0.4*"></ColumnDefinition>
+                                <ColumnDefinition Width="0.3*"></ColumnDefinition>
+                                <ColumnDefinition Width="30"></ColumnDefinition>
+                                <ColumnDefinition Width="0.2*"></ColumnDefinition>
                                 <ColumnDefinition Width="0.2*"></ColumnDefinition>
                                 <ColumnDefinition Width="0.2*"></ColumnDefinition>
                                 <ColumnDefinition Width="30"></ColumnDefinition>
@@ -42,14 +44,17 @@
 
                             <TextBlock Grid.Column="0" Style="{StaticResource li-16}" Text="{Binding Name}"></TextBlock>
 
-                            <ComboBox Grid.Column="1" Style="{StaticResource li-16}"
+                            <Image Grid.Column="1" Source="../Files/Image/volume-24.png" HorizontalAlignment="Center"></Image>
+                            <Slider Grid.Column="2" Minimum="0" Maximum="1" Value="{Binding Volume}" Style="{StaticResource li-16}"
+                                    IsEnabled="{Binding IsEditEnabled}"></Slider>
+                            <ComboBox Grid.Column="3" Style="{StaticResource li-16}"
                                   ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys1}" 
                                   SelectedItem="{Binding StrHotKey1}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
-                            <ComboBox Grid.Column="2" Style="{StaticResource li-16}"
+                            <ComboBox Grid.Column="4" Style="{StaticResource li-16}"
                                   ItemsSource="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.HotKeys2}"  
                                   SelectedItem="{Binding StrHotKey2}" IsEnabled="{Binding IsEditEnabled}"></ComboBox>
 
-                            <Button Grid.Column="3" VerticalAlignment="Center" Margin="2 0" Background="IndianRed"
+                            <Button Grid.Column="5" VerticalAlignment="Center" Margin="2 0" Background="IndianRed"
                                     IsEnabled="{Binding IsEditEnabled}"
                                     Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.DeleteAudioCommand}">
                                 <Image Source="../Files/Image/delete-24.png" Width="21"></Image>

@@ -17,6 +17,7 @@ namespace PlaySound.Model
         public string StrHotKey1 { get; set; }
         public Key HotKey2 { get; set; }
         public string StrHotKey2 { get; set; }
+        public float Volume { get; set; }
 
         private bool isEditEnabled = false;
 
