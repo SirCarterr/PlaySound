@@ -23,19 +23,16 @@
                 <RowDefinition Height="50"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch"  
+            <ListView Grid.Row="0" HorizontalContentAlignment="Stretch" Focusable="True"
                       ItemsSource="{Binding Audios}" SelectedItem="{Binding SelectedAudio}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Height="25">
-                            <Grid.InputBindings>
-                                <!--<KeyBinding Modifiers="{Binding HotKey1}" Key="{Binding HotKey2}"
-                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.PlayAudioCommnad}"
-                                            CommandParameter="{Binding Path}"></KeyBinding>-->
-                                <KeyBinding Modifiers="Ctrl" Key="NumPad0"
-                                            Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Path=DataContext.PlayAudioCommand}"
+                        <Grid Height="25" Focusable="True">
+                            <!--<Grid.InputBindings>
+                                <KeyBinding Key="NumPad0"
+                                            Command="{Binding DataContext.PlayAudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
                                             CommandParameter="{Binding Path}"></KeyBinding>
-                            </Grid.InputBindings>
+                            </Grid.InputBindings>-->
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="0.4*"></ColumnDefinition>
                                 <ColumnDefinition Width="0.2*"></ColumnDefinition>

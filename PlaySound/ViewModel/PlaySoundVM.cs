@@ -20,7 +20,11 @@ namespace PlaySound.ViewModel
     {
         //Class data
         private readonly AudioManager _audioManager;
-        private readonly AudioPlayer _audioPlayer;
+        private readonly AudioPlaybackService _audioPlaybackService;
+        private readonly GlobalHotKeyService _globalHotKeyService;
+
+        private List<CachedSound> _soundsVB = new List<CachedSound>();
+        private List<CachedSound> _soundsDefault = new List<CachedSound>();
 
         public static string[] HotKeys1
         { 
@@ -101,14 +105,14 @@ namespace PlaySound.ViewModel
         public FinishEditingCommand FinishEditingCommand { get; set; }
         public CancelEditCommand CancelEditCommand { get; set; }
         public DeleteAudioCommand DeleteAudioCommand { get; set; }
-        public PlayAudioCommand PlayAudioCommand { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public PlaySoundVM()
         {
             _audioManager = new AudioManager();
-            _audioPlayer = new AudioPlayer();
+            _audioPlaybackService = new AudioPlaybackService();
+            _globalHotKeyService = new GlobalHotKeyService();
             UpdateAudiosList();
 
             GetAudioFileCommand = new GetAudioFileCommand(this);
@@ -116,7 +120,6 @@ namespace PlaySound.ViewModel
             FinishEditingCommand = new FinishEditingCommand(this);
             CancelEditCommand = new CancelEditCommand(this);
             DeleteAudioCommand = new DeleteAudioCommand(this);
-            PlayAudioCommand = new PlayAudioCommand(this);
         }
 
         public void GetAudioFile()
@@ -140,14 +143,12 @@ namespace PlaySound.ViewModel
                 {
                     Path = dialog.FileName,
                     Name = dialog.FileName.Split('\\').Last(),
-                    HotKey1 = System.Windows.Input.ModifierKeys.None,
-                    HotKey2 = System.Windows.Input.Key.None,
+                    StrHotKey1 = "None",
+                    StrHotKey2 = "None",
                 };
                 _audioManager.AddAudio(audio);
                 UpdateAudiosList();
             }
-            //var window = Application.Current.Windows.OfType<Window>().SingleOrDefault(w => !w.IsActive && w.Name.Equals("SettingsPlaySound"));
-            //window?.Focus();
         }
 
         public void StartEditing()
@@ -207,16 +208,28 @@ namespace PlaySound.ViewModel
         {
             SelectedAudio = new();
             Audios.Clear();
+            _soundsVB.Clear();
+            _soundsDefault.Clear();
+            _globalHotKeyService.UnregisterAllHotkeys();
             var audios = _audioManager.GetAllAudios();
             foreach (var audio in audios)
             {
+                if (!File.Exists(audio.Path))
+                    continue;
+
                 Audios.Add(audio);
+                _soundsVB.Add(new CachedSound(audio.Id, audio.Path));
+                _soundsDefault.Add(new CachedSound(audio.Id, audio.Path));
+                _globalHotKeyService.RegisterHotkey(audio.HotKey1, audio.HotKey2, () => PlayAudio(audio.Id));
             }
         }
 
-        public void PlayAudio(string filePath)
+        private void PlayAudio(int Id)
         {
-            _audioPlayer.Play(filePath);
+            CachedSound soundVB = _soundsVB.First(s => s.Id == Id);
+            CachedSound soundDefault = _soundsDefault.First(s => s.Id == Id);
+            _audioPlaybackService.PlaySoundVB(soundVB);
+            _audioPlaybackService.PlaySoundDefault(soundDefault);
         }
 
         private void OnPropertyChanged(string propertyName)

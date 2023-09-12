@@ -9,10 +9,12 @@ namespace PlaySound.Model
 {
     public class CachedSound
     {
+        public int Id { get; set; }
         public byte[] AudioData { get; private set; }
         public WaveFormat WaveFormat { get; private set; }
-        public CachedSound(string audioFileName)
+        public CachedSound(int id, string audioFileName)
         {
+            Id = id;
             using (var audioFileReader = new Mp3FileReader(audioFileName))
             {
                 // TODO: could add resampling in here if required
