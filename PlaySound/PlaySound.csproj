@@ -5,12 +5,17 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>audio-channels-30.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Files\Image\delete-24.png" />
     <None Remove="Files\Image\volume-24.png" />
     <None Remove="Files\Settings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="audio-channels-30.ico" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using NAudio.CoreAudioApi;
 using PlaySound.Common;
 using PlaySound.Model;
 using PlaySound.View;
@@ -111,8 +112,12 @@ namespace PlaySound.ViewModel
         public PlaySoundVM()
         {
             _audioManager = new AudioManager();
-            _audioPlaybackService = new AudioPlaybackService();
             _globalHotKeyService = new GlobalHotKeyService();
+
+            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
+            MMDevice defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            int outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
+            _audioPlaybackService = new AudioPlaybackService(outRate);
             UpdateAudiosList();
 
             GetAudioFileCommand = new GetAudioFileCommand(this);

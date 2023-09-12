@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.CoreAudioApi;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +21,17 @@ namespace PlaySound.Model
             using (var audioFileReader = new Mp3FileReader(audioFileName))
             {
                 // TODO: could add resampling in here if required
-                WaveFormat = audioFileReader.WaveFormat;
+                MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
+                MMDevice defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                int outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
+                //int outRate = 48000;
+                var outFormat = new WaveFormat(outRate, audioFileReader.WaveFormat.Channels);
+                using var resampler = new MediaFoundationResampler(audioFileReader, outFormat);
+                WaveFormat = resampler.WaveFormat;
                 var wholeFile = new List<byte>((int)(audioFileReader.Length / 4));
-                var readBuffer = new byte[audioFileReader.WaveFormat.SampleRate * audioFileReader.WaveFormat.Channels];
+                var readBuffer = new byte[resampler.WaveFormat.SampleRate * resampler.WaveFormat.Channels];
                 int samplesRead;
-                while ((samplesRead = audioFileReader.Read(readBuffer, 0, readBuffer.Length)) > 0)
+                while ((samplesRead = resampler.Read(readBuffer, 0, readBuffer.Length)) > 0)
                 {
                     wholeFile.AddRange(readBuffer.Take(samplesRead));
                 }
