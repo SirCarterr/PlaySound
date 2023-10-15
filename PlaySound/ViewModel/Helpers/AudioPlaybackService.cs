@@ -11,14 +11,37 @@ namespace PlaySound.ViewModel.Helpers
 {
     public class AudioPlaybackService : IDisposable
     { 
-        private readonly WaveOutEvent outputDeviceVB;
-        private readonly WaveOutEvent outputDeviceDefault;
-        private readonly MixingSampleProvider mixerVB;
-        private readonly MixingSampleProvider mixerDefault;
+        private WaveOutEvent outputDeviceVB;
+        private WaveOutEvent outputDeviceDefault;
+        private MixingSampleProvider mixerVB;
+        private MixingSampleProvider mixerDefault;
 
         private readonly string virtualCableDevice = "CABLE Input";
 
         public AudioPlaybackService(int sampleRate = 48000, int channelCount = 2)
+        {
+            InitializeDevices(sampleRate, channelCount);
+        }
+
+        public void PlaySoundVB(CachedSound sound)
+        {
+            outputDeviceVB.Volume = sound.Volume / 3;
+            AddMixerInputVB(new CachedSoundWaveProvider(sound));
+        }
+
+        public void PlaySoundDefault(CachedSound sound)
+        {
+            outputDeviceDefault.Volume = sound.Volume;
+            AddMixerInputDefault(new CachedSoundWaveProvider(sound));
+        }
+        public void StopAudio()
+        {
+            outputDeviceVB.Stop();
+            outputDeviceDefault.Stop();
+            InitializeDevices(48000, 2);
+        }
+
+        private void InitializeDevices(int sampleRate, int channelCount)
         {
             outputDeviceDefault = new WaveOutEvent();
             outputDeviceVB = new WaveOutEvent();
@@ -54,18 +77,6 @@ namespace PlaySound.ViewModel.Helpers
             throw new NotImplementedException("Not yet implemented this channel count conversion");
         }
 
-        public void PlaySoundVB(CachedSound sound)
-        {
-            outputDeviceVB.Volume = sound.Volume;
-            AddMixerInputVB(new CachedSoundWaveProvider(sound));
-        }
-
-        public void PlaySoundDefault(CachedSound sound)
-        {
-            outputDeviceDefault.Volume = sound.Volume;
-            AddMixerInputDefault(new CachedSoundWaveProvider(sound));
-        }
-
         private void AddMixerInputVB(IWaveProvider input)
         {
             mixerVB.AddMixerInput(ConvertToRightChannelCount(input));
@@ -75,6 +86,7 @@ namespace PlaySound.ViewModel.Helpers
         {
             mixerDefault.AddMixerInput(ConvertToRightChannelCount(input));
         }
+
 
         public void Dispose()
         {

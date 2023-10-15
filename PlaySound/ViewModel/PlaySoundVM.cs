@@ -119,6 +119,7 @@ namespace PlaySound.ViewModel
             int outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
             _audioPlaybackService = new AudioPlaybackService(outRate);
             UpdateAudiosList();
+            _globalHotKeyService.RegisterHotkey(System.Windows.Input.ModifierKeys.Control, System.Windows.Input.Key.End, StopAudio);
 
             GetAudioFileCommand = new GetAudioFileCommand(this);
             StartEditCommand = new StartEditCommand(this);
@@ -209,6 +210,11 @@ namespace PlaySound.ViewModel
                 IsEditingView = Visibility.Hidden;
                 IsMainView = Visibility.Visible;
             }
+        }
+
+        private void StopAudio()
+        {
+            _audioPlaybackService.StopAudio();
         }
 
         private void UpdateAudiosList()
