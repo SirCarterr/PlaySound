@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlaySound.ViewModel.Helpers
+namespace PlaySound.Helpers
 {
     public class CachedSoundWaveProvider : IWaveProvider
     {

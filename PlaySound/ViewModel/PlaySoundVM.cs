@@ -1,17 +1,11 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using NAudio.CoreAudioApi;
 using PlaySound.Common;
 using PlaySound.Model;
-using PlaySound.View;
+using PlaySound.Services;
 using PlaySound.ViewModel.Commands;
-using PlaySound.ViewModel.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -20,35 +14,19 @@ namespace PlaySound.ViewModel
     public class PlaySoundVM : INotifyPropertyChanged
     {
         //Class data
-        private readonly AudioManager _audioManager;
-        private readonly AudioPlaybackService _audioPlaybackService;
-        private readonly GlobalHotKeyService _globalHotKeyService;
+        private readonly AudioService _audioService;
+        private readonly AudioManagerService _audioManagerService;
 
-        private List<CachedSound> _soundsVB = new List<CachedSound>();
-        private List<CachedSound> _soundsDefault = new List<CachedSound>();
+        public static string[] HotKeys1 => HotKeys.hotkeysDictionary1.Keys.ToArray();
 
-        public static string[] HotKeys1
-        { 
-            get 
-            {
-                return SD.hotkeysDictionary1.Keys.ToArray();
-            } 
-        }
-        
-        public static string[] HotKeys2
-        { 
-            get 
-            {
-                return SD.hotkeysDictionary2.Keys.ToArray();
-            } 
-        }
+        public static string[] HotKeys2 => HotKeys.hotkeysDictionary2.Keys.ToArray();
 
         //Binding properties
-        public ObservableCollection<AudioDTO> Audios { get; set; } = new();
+        public ObservableCollection<AudioDto> Audios { get; set; } = new();
 
-        private AudioDTO selectedAudio = new();
+        private AudioDto selectedAudio = new();
 
-        public AudioDTO SelectedAudio
+        public AudioDto SelectedAudio
         {
             get { return selectedAudio; }
             set
@@ -111,16 +89,11 @@ namespace PlaySound.ViewModel
 
         public PlaySoundVM()
         {
-            _audioManager = new AudioManager();
-            _globalHotKeyService = new GlobalHotKeyService();
-
-            MMDeviceEnumerator enumerator = new MMDeviceEnumerator();
-            MMDevice defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            int outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
-            _audioPlaybackService = new AudioPlaybackService(outRate);
-            UpdateAudiosList();
-            _globalHotKeyService.RegisterHotkey(System.Windows.Input.ModifierKeys.Control, System.Windows.Input.Key.End, StopAudio);
-
+            _audioService = new AudioService();
+            _audioManagerService = new AudioManagerService();
+            
+            Task.FromResult(UpdateAudiosList());
+            
             GetAudioFileCommand = new GetAudioFileCommand(this);
             StartEditCommand = new StartEditCommand(this);
             FinishEditingCommand = new FinishEditingCommand(this);
@@ -128,50 +101,43 @@ namespace PlaySound.ViewModel
             DeleteAudioCommand = new DeleteAudioCommand(this);
         }
 
-        public void GetAudioFile()
+        public async Task GetAudioFile()
         {
             var dialog = new CommonOpenFileDialog();
+            
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                FileInfo fileInfo = new(dialog.FileName);
-                if (fileInfo.Extension != ".mp3")
+                var response = FileService.GetFileName(dialog.FileName);
+
+                if (!response.IsSuccess)
                 {
-                    MessageBox.Show("Invalid file extension!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-                if(fileInfo.Length > 3000000)
-                {
-                    MessageBox.Show("Chosen file size exceed 3Mb!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(response.Message, DialogCaptions.Error.ToString(), MessageBoxButton.OK, MessageBoxImage.Error);
+                    
                     return;
                 }
 
-                AudioDTO audio = new()
-                {
-                    Path = dialog.FileName,
-                    Name = dialog.FileName.Split('\\').Last(),
-                    StrHotKey1 = "None",
-                    StrHotKey2 = "None",
-                    Volume = 1.0f
-                };
-                _audioManager.AddAudio(audio);
-                UpdateAudiosList();
+                await _audioService.AddAudio(response.Audio!);
+                
+                await UpdateAudiosList();
             }
         }
 
         public void StartEditing()
         {
             IsEditing = true;
+
             IsEditingView = Visibility.Visible;
             IsMainView = Visibility.Hidden;
+
             SelectedAudio.IsEditEnabled = true;
         }
 
-        public void FinishEditing()
+        public async Task FinishEditing()
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
 
-            AudioDTO audio = new()
+            AudioDto audio = new()
             {
                 Id = SelectedAudio.Id,
                 Path = SelectedAudio.Path,
@@ -181,68 +147,56 @@ namespace PlaySound.ViewModel
                 Volume = SelectedAudio.Volume
             };
 
-            _audioManager.UpdateAudio(audio);
-            UpdateAudiosList();
+            await _audioService.UpdateAudio(audio);
+            
+            await UpdateAudiosList();
             
             IsEditingView = Visibility.Hidden;
             IsMainView = Visibility.Visible;
         }
 
-        public void CancelEditing()
+        public async Task CancelEditing()
         {
             SelectedAudio.IsEditEnabled = false;
             IsEditing = false;
-            UpdateAudiosList();
+
+            await UpdateAudiosList();
+
             IsEditingView = Visibility.Hidden;
             IsMainView = Visibility.Visible;
         }
 
-        public void DeleteAudio()
+        public async Task DeleteAudio()
         {
-            var Result = MessageBox.Show("Do you want to remove this audio?", "Attention", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            var Result = MessageBox.Show(DialogMessages.DeleteQuestion, DialogCaptions.Attention.ToString(), MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if(Result == MessageBoxResult.Yes)
             {
                 SelectedAudio.IsEditEnabled = false;
                 IsEditing = false;
-                _audioManager.RemoveAudio(SelectedAudio.Id);
-                UpdateAudiosList();
+                
+                await _audioService.RemoveAudio(SelectedAudio.Id);
+                
+                await UpdateAudiosList();
+                
                 IsEditingView = Visibility.Hidden;
                 IsMainView = Visibility.Visible;
             }
         }
 
-        private void StopAudio()
-        {
-            _audioPlaybackService.StopAudio();
-        }
-
-        private void UpdateAudiosList()
+        private async Task UpdateAudiosList()
         {
             SelectedAudio = new();
             Audios.Clear();
-            _soundsVB.Clear();
-            _soundsDefault.Clear();
-            _globalHotKeyService.UnregisterAllHotkeys();
-            var audios = _audioManager.GetAllAudios();
+
+            var audios = await _audioService.GetAllAudios();
+
+            _audioManagerService.InitializeHotKeys(audios);
+
             foreach (var audio in audios)
             {
-                if (!File.Exists(audio.Path))
-                    continue;
-
                 Audios.Add(audio);
-                _soundsVB.Add(new CachedSound(audio.Id, audio.Volume, audio.Path));
-                _soundsDefault.Add(new CachedSound(audio.Id, audio.Volume, audio.Path));
-                _globalHotKeyService.RegisterHotkey(audio.HotKey1, audio.HotKey2, () => PlayAudio(audio.Id));
             }
-        }
-
-        private void PlayAudio(int Id)
-        {
-            CachedSound soundVB = _soundsVB.First(s => s.Id == Id);
-            CachedSound soundDefault = _soundsDefault.First(s => s.Id == Id);
-            _audioPlaybackService.PlaySoundVB(soundVB);
-            _audioPlaybackService.PlaySoundDefault(soundDefault);
         }
 
         private void OnPropertyChanged(string propertyName)

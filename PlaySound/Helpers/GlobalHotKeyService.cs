@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Interop;
 
-namespace PlaySound.ViewModel.Helpers
+namespace PlaySound.Helpers
 {
     public class GlobalHotKeyService : IDisposable
     {
         private const int WM_HOTKEY = 0x0312;
         private readonly IntPtr hWnd;
-        private readonly Dictionary<int, Action> hotkeyActions = new Dictionary<int, Action>();
-        private readonly Dictionary<int, int> hotkeyIds = new Dictionary<int, int>();
+        private readonly Dictionary<int, Action> hotkeyActions = new();
+        private readonly Dictionary<int, int> hotkeyIds = new();
+        
+        private bool disposed = false;
 
         public GlobalHotKeyService()
         {
@@ -28,12 +28,11 @@ namespace PlaySound.ViewModel.Helpers
             var virtualKey = KeyInterop.VirtualKeyFromKey(key);
 
             var hotkeyId = new Random().Next(0, 100000);
+
             if (RegisterHotKey(hWnd, hotkeyId, keyModifier, virtualKey))
             {
                 hotkeyActions.Add(hotkeyId, hotkeyAction);
                 hotkeyIds.Add(hotkeyId, virtualKey);
-                //hotkeyActions[hotkeyId] = hotkeyAction;
-                //hotkeyIds[hotkeyId] = virtualKey;
             }
         }
 
@@ -43,20 +42,36 @@ namespace PlaySound.ViewModel.Helpers
             {
                 UnregisterHotKey(hWnd, hotkeyId);
             }
+
             hotkeyActions.Clear();
             hotkeyIds.Clear();
         }
 
-        public void Dispose()
+        protected virtual void Dispose(bool disposing)
         {
-            ComponentDispatcher.ThreadPreprocessMessage -= ThreadPreprocessMessage;
-            foreach (var hotkeyId in hotkeyActions.Keys)
+            if (!disposed)
             {
-                UnregisterHotKey(hWnd, hotkeyId);
+                if (disposing)
+                {
+                    ComponentDispatcher.ThreadPreprocessMessage -= ThreadPreprocessMessage;
+
+                    foreach (var hotkeyId in hotkeyActions.Keys)
+                    {
+                        UnregisterHotKey(hWnd, hotkeyId);
+                    }
+                }
+
+                disposed = true;
             }
         }
 
-        private void ThreadPreprocessMessage(ref System.Windows.Interop.MSG msg, ref bool handled)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void ThreadPreprocessMessage(ref MSG msg, ref bool handled)
         {
             if (msg.message == WM_HOTKEY && hotkeyActions.TryGetValue((int)msg.wParam, out var action))
             {
@@ -74,18 +89,18 @@ namespace PlaySound.ViewModel.Helpers
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct MSG
+        private struct Msg
         {
             public IntPtr hwnd;
             public uint message;
             public IntPtr wParam;
             public IntPtr lParam;
             public uint time;
-            public POINT pt;
+            public Point pt;
         }
 
         [StructLayout(LayoutKind.Sequential)]
-        private struct POINT
+        private struct Point
         {
             public int x;
             public int y;
