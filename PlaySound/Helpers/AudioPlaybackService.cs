@@ -2,21 +2,19 @@
 using NAudio.Wave;
 using PlaySound.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PlaySound.ViewModel.Helpers
+namespace PlaySound.Helpers
 {
     public class AudioPlaybackService : IDisposable
-    { 
-        private WaveOutEvent outputDeviceVB;
-        private WaveOutEvent outputDeviceDefault;
-        private MixingSampleProvider mixerVB;
-        private MixingSampleProvider mixerDefault;
+    {
+        private WaveOutEvent outputDeviceVB = null!;
+        private WaveOutEvent outputDeviceDefault = null!;
+        private MixingSampleProvider mixerVB = null!;
+        private MixingSampleProvider mixerDefault = null!;
 
-        private readonly string virtualCableDevice = "CABLE Input";
+        private const string VirtualCableDevice = "CABLE Input";
+        
+        private bool disposed;
 
         public AudioPlaybackService(int sampleRate = 48000, int channelCount = 2)
         {
@@ -26,18 +24,25 @@ namespace PlaySound.ViewModel.Helpers
         public void PlaySoundVB(CachedSound sound)
         {
             outputDeviceVB.Volume = sound.Volume / 3;
-            AddMixerInputVB(new CachedSoundWaveProvider(sound));
+
+            var cachedSound = new CachedSoundWaveProvider(sound);
+
+            mixerVB.AddMixerInput(ConvertToRightChannelCount(cachedSound));
         }
 
         public void PlaySoundDefault(CachedSound sound)
         {
             outputDeviceDefault.Volume = sound.Volume;
-            AddMixerInputDefault(new CachedSoundWaveProvider(sound));
+
+            var cachedSound = new CachedSoundWaveProvider(sound);
+
+            mixerDefault.AddMixerInput(ConvertToRightChannelCount(cachedSound));
         }
         public void StopAudio()
         {
             outputDeviceVB.Stop();
             outputDeviceDefault.Stop();
+
             InitializeDevices(48000, 2);
         }
 
@@ -48,7 +53,7 @@ namespace PlaySound.ViewModel.Helpers
             for (int idx = 0; idx < WaveOut.DeviceCount; ++idx)
             {
                 var device = WaveOut.GetCapabilities(idx);
-                if (device.ProductName.Contains(virtualCableDevice))
+                if (device.ProductName.Contains(VirtualCableDevice))
                 {
                     outputDeviceVB.DeviceNumber = idx;
                     break;
@@ -70,30 +75,35 @@ namespace PlaySound.ViewModel.Helpers
             {
                 return input;
             }
+
             if (input.WaveFormat.Channels == 1 && mixerVB.WaveFormat.Channels == 2)
             {
                 return new MonoToStereoProvider16(input);
             }
+
             throw new NotImplementedException("Not yet implemented this channel count conversion");
         }
 
-        private void AddMixerInputVB(IWaveProvider input)
+        protected virtual void Dispose(bool disposing)
         {
-            mixerVB.AddMixerInput(ConvertToRightChannelCount(input));
-        }
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    outputDeviceVB.Dispose();
+                    outputDeviceDefault.Dispose();
+                }
 
-        private void AddMixerInputDefault(IWaveProvider input)
-        {
-            mixerDefault.AddMixerInput(ConvertToRightChannelCount(input));
+                disposed = true;
+            }
         }
-
 
         public void Dispose()
         {
-            outputDeviceVB.Dispose();
-            outputDeviceDefault.Dispose();
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
-        public static readonly AudioPlaybackService Instance = new AudioPlaybackService(48000, 2);
+        public static readonly AudioPlaybackService Instance = new(48000, 2);
     }
 }

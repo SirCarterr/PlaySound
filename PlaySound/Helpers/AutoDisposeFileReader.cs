@@ -1,11 +1,6 @@
 ﻿using NAudio.Wave;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PlaySound.ViewModel.Helpers
+namespace PlaySound.Helpers
 {
     public class AutoDisposeFileReader : IWaveProvider
     {
@@ -14,7 +9,7 @@ namespace PlaySound.ViewModel.Helpers
         public AutoDisposeFileReader(Mp3FileReader reader)
         {
             this.reader = reader;
-            this.WaveFormat = reader.WaveFormat;
+            WaveFormat = reader.WaveFormat;
         }
 
         public int Read(byte[] buffer, int offset, int count)
