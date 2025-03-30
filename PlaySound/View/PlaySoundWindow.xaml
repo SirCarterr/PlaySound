@@ -8,15 +8,13 @@
         mc:Ignorable="d"
         Title="PlaySound" Height="450" Width="700" Background="Beige" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <vm:PlaySoundVM x:Key="vm"/>
-
         <Style x:Key="li-16">
             <Setter Property="ItemsControl.FontSize" Value="16"/>
             <Setter Property="ItemsControl.VerticalAlignment" Value="Center"/>
             <Setter Property="ItemsControl.Margin" Value="5 0"></Setter>
         </Style>
     </Window.Resources>
-    <Grid DataContext="{StaticResource vm}" Margin="10 10 10 10" Background="Beige">
+    <Grid DataContext="{Binding}" Margin="10 10 10 10" Background="Beige">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
@@ -28,11 +26,6 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Height="25" Focusable="True">
-                            <!--<Grid.InputBindings>
-                                <KeyBinding Key="NumPad0"
-                                            Command="{Binding DataContext.PlayAudioCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}"
-                                            CommandParameter="{Binding Path}"></KeyBinding>
-                            </Grid.InputBindings>-->
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="250"></ColumnDefinition>
                                 <ColumnDefinition Width="30"></ColumnDefinition>
@@ -71,12 +64,6 @@
                     <ColumnDefinition Width="0.3*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <!--<Button Grid.Column="0" BorderThickness="0.5" Margin="10" Background="White">
-                    <Image Source="../Files/Image/play-50.png" Width="20"></Image>
-                </Button>
-                <Button Grid.Column="1" BorderThickness="0.5" Margin="10" Background="White">
-                    <Image Source="../Files/Image/stop-50.png" Width="20"></Image>
-                </Button>-->
                 <Button Grid.Column="0" Margin="8" BorderThickness="0.5" Background="WhiteSmoke"
                         Visibility="{Binding IsMainView}" Command="{Binding GetAudioFileCommand}">
                     <TextBlock FontSize="14">Add</TextBlock>

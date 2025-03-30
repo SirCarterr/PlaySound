@@ -1,4 +1,5 @@
 ﻿using PlaySound.Converter;
+using PlaySound.Interfaces;
 using PlaySound.Model;
 using PlaySound.Repositories;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PlaySound.Services
 {
-    public class AudioService
+    public class AudioService : IAudioService
     {
         private readonly AudioRepository _audioRepository;
 
@@ -18,20 +19,20 @@ namespace PlaySound.Services
         public async Task AddAudio(AudioDto audioDto)
         {
             var audio = AudioConverter.ConvertFromDTO(audioDto);
-
+            
             await _audioRepository.AddAudio(audio);
         }
 
-        public async Task<int> RemoveAudio(int id)
+        public async Task RemoveAudio(int id)
         {
-            return await _audioRepository.RemoveAudio(id);
+            await _audioRepository.RemoveAudio(id);
         }
 
-        public async Task<int> UpdateAudio(AudioDto audioDto)
+        public async Task UpdateAudio(AudioDto audioDto)
         {
             var audio = AudioConverter.ConvertFromDTO(audioDto);
             
-            return await _audioRepository.UpdateAudio(audio);
+            await _audioRepository.UpdateAudio(audio);
         }
 
         public async Task<AudioDto> GetAudio(int id)
@@ -41,7 +42,7 @@ namespace PlaySound.Services
             return AudioConverter.ConvertToDTO(audio);
         }
 
-        public async Task<List<AudioDto>> GetAllAudios()
+        public async Task<IEnumerable<AudioDto>> GetAllAudios()
         {
             var audios = await _audioRepository.GetAllAudios();
             

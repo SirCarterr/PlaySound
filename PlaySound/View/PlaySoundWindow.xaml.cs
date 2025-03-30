@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using PlaySound.ViewModel;
 
 namespace PlaySound.View
 {
@@ -19,9 +20,10 @@ namespace PlaySound.View
     /// </summary>
     public partial class PlaySoundWindow : Window
     {
-        public PlaySoundWindow()
+        public PlaySoundWindow(PlaySoundVM viewModel)
         {
             InitializeComponent();
+            DataContext = viewModel;
         }
     }
 }
