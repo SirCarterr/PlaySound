@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using PlaySound.Interfaces;
-using PlaySound.Services;
-using PlaySound.ViewModel;
+using PlaySound.Extensions;
 using System;
 using System.Windows;
 
@@ -23,16 +21,10 @@ namespace PlaySound
 
         private void ConfigureServices(ServiceCollection services)
         {
-            // Register services
-            services.AddSingleton<IAudioService, AudioService>();
-            services.AddSingleton<IAudioManagerService, AudioManagerService>();
-            services.AddSingleton<IDialogService, DialogService>();
-
-            // Register ViewModels
-            services.AddSingleton<PlaySoundVM>();
-
-            // Register Views
-            services.AddTransient<View.PlaySoundWindow>();
+            services
+                .AddApplicationServices()
+                .AddViewModels()
+                .AddViews();
         }
 
         protected override void OnStartup(StartupEventArgs e)

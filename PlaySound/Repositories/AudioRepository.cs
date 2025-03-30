@@ -15,7 +15,6 @@ namespace PlaySound.Repositories
             _db = new ApplicationContext();
             
             _db.Database.EnsureCreated();
-            _db.Audios.Load();
         }
 
         public async Task AddAudio(Audio audio)
@@ -27,7 +26,9 @@ namespace PlaySound.Repositories
 
         public async Task<int> RemoveAudio(int id)
         {
-            var audio = await _db.Audios.FirstOrDefaultAsync(x => x.Id == id);
+            var audio = await _db.Audios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
             
             if (audio != null)
             {
@@ -40,25 +41,35 @@ namespace PlaySound.Repositories
 
         public async Task<int> UpdateAudio(Audio audio)
         {
-            var entry = _db.Entry(audio);
+            _db.ChangeTracker.Clear();
+            
+            var existingAudio = await _db.Audios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == audio.Id);
 
-            entry.State = EntityState.Modified;
+            if (existingAudio == null)
+            {
+                return 0;
+            }
 
+            _db.Audios.Update(audio);
             return await _db.SaveChangesAsync();
         }
 
         public async Task<Audio> GetAudio(int id)
         {
-            var audio = await _db.Audios.FirstOrDefaultAsync(x => x.Id == id);
+            var audio = await _db.Audios
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
             
             return audio ?? new();
         }
 
         public async Task<List<Audio>> GetAllAudios()
         {
-            var audios = await _db.Audios.ToListAsync();
-
-            return audios;
+            return await _db.Audios
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }
