@@ -1,5 +1,5 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using PlaySound.Common;
+using PlaySound.Constants;
 using PlaySound.Interfaces;
 using PlaySound.Model;
 using PlaySound.Services;
@@ -17,6 +17,7 @@ namespace PlaySound.ViewModel
         private readonly IAudioService _audioService;
         private readonly IAudioManagerService _audioManagerService;
         private readonly IDialogService _dialogService;
+        private readonly FileService _fileService;
 
         public static string[] HotKeys1 => HotKeys.hotkeysDictionary1.Keys.ToArray();
         public static string[] HotKeys2 => HotKeys.hotkeysDictionary2.Keys.ToArray();
@@ -64,11 +65,13 @@ namespace PlaySound.ViewModel
         public PlaySoundVM(
             IAudioService audioService, 
             IAudioManagerService audioManagerService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            FileService fileService)
         {
             _audioService = audioService;
             _audioManagerService = audioManagerService;
             _dialogService = dialogService;
+            _fileService = fileService;
             
             Task.FromResult(UpdateAudiosList());
             
@@ -84,7 +87,7 @@ namespace PlaySound.ViewModel
             var fileName = await _dialogService.OpenFileDialog("Audio files (*.mp3)|*.mp3");
             if (fileName != null)
             {
-                var response = FileService.GetFileName(fileName);
+                var response = _fileService.GetFileName(fileName);
 
                 if (!response.IsSuccess)
                 {

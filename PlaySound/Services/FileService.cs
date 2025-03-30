@@ -1,23 +1,26 @@
 ﻿using PlaySound.Common;
+using PlaySound.Constants;
+using PlaySound.Interfaces;
 using PlaySound.Model;
 using System.IO;
 using System.Linq;
 
 namespace PlaySound.Services
 {
-    public static class FileService
+    public class FileService
     {
-        private const string ValidExtension = ".mp3";
-        private const int MaxFileSize = 3000000;
+        private readonly IConfigurationService _configurationService;
 
-        private const string DefaultHotKetName = "None";
-        private const float DefaultVolume = 1.0f;
+        public FileService(IConfigurationService configurationService)
+        {
+            _configurationService = configurationService;
+        }
 
-        public static DialogResponseDto GetFileName(string fileName)
+        public DialogResponseDto GetFileName(string fileName)
         {
             FileInfo fileInfo = new(fileName);
             
-            if (fileInfo.Extension != ValidExtension)
+            if (fileInfo.Extension != _configurationService.ValidAudioExtension)
             {
                 return new DialogResponseDto
                 {
@@ -26,7 +29,7 @@ namespace PlaySound.Services
                 };
             }
             
-            if (fileInfo.Length > MaxFileSize)
+            if (fileInfo.Length > _configurationService.MaxFileSize)
             {
                 return new DialogResponseDto
                 {
@@ -39,9 +42,9 @@ namespace PlaySound.Services
             {
                 Path = fileName,
                 Name = fileName.Split('\\').Last(),
-                StrHotKey1 = DefaultHotKetName,
-                StrHotKey2 = DefaultHotKetName,
-                Volume = DefaultVolume
+                StrHotKey1 = _configurationService.DefaultHotKeyName,
+                StrHotKey2 = _configurationService.DefaultHotKeyName,
+                Volume = _configurationService.DefaultVolume
             };
 
             return new DialogResponseDto
