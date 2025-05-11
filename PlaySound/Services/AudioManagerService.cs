@@ -12,6 +12,8 @@ namespace PlaySound.Services
     {
         private readonly GlobalHotKeyService _globalHotKeyService;
         private readonly AudioPlaybackService _audioPlaybackService;
+        private readonly MMDeviceEnumerator _deviceEnumerator;
+        private readonly MMDevice _defaultPlaybackDevice;
 
         private readonly List<CachedSound> _soundsVB = new();
         private readonly List<CachedSound> _soundsDefault = new();
@@ -19,13 +21,9 @@ namespace PlaySound.Services
         public AudioManagerService()
         {
             _globalHotKeyService = new GlobalHotKeyService();
-
-            var enumerator = new MMDeviceEnumerator();
-            var defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-
-            var outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
-
-            _audioPlaybackService = new AudioPlaybackService(outRate);
+            _deviceEnumerator = new MMDeviceEnumerator();
+            _defaultPlaybackDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            _audioPlaybackService = new AudioPlaybackService(_defaultPlaybackDevice.AudioClient.MixFormat.SampleRate);
         }
 
         public void InitializeHotKeys(IEnumerable<AudioDto> audioDtos)

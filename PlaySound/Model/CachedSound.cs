@@ -1,5 +1,6 @@
 ﻿using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using PlaySound.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,18 +20,10 @@ namespace PlaySound.Model
 
             using var audioFileReader = new Mp3FileReader(audioFileName);
             
-            var outFormat = GetOutputFormat(audioFileReader);
+            var outFormat = AudioFormatHelper.GetOutputFormat(audioFileReader.WaveFormat);
             
             WaveFormat = outFormat;
             AudioData = ReadAudioData(audioFileReader, outFormat);
-        }
-
-        private static WaveFormat GetOutputFormat(Mp3FileReader audioFileReader)
-        {
-            var enumerator = new MMDeviceEnumerator();
-            
-            var defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            return new WaveFormat(defaultPlaybackDevice.AudioClient.MixFormat.SampleRate, audioFileReader.WaveFormat.Channels);
         }
 
         private static byte[] ReadAudioData(Mp3FileReader audioFileReader, WaveFormat outFormat)

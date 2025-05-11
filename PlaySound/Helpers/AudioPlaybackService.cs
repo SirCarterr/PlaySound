@@ -1,5 +1,6 @@
 ﻿using NAudio.Wave.SampleProviders;
 using NAudio.Wave;
+using PlaySound.Constants;
 using PlaySound.Model;
 using System;
 
@@ -16,7 +17,7 @@ namespace PlaySound.Helpers
         
         private bool disposed;
 
-        public AudioPlaybackService(int sampleRate = 48000, int channelCount = 2)
+        public AudioPlaybackService(int sampleRate = AudioConstants.DefaultSampleRate, int channelCount = AudioConstants.DefaultChannelCount)
         {
             InitializeDevices(sampleRate, channelCount);
         }
@@ -65,7 +66,7 @@ namespace PlaySound.Helpers
             for (int idx = 0; idx < WaveOut.DeviceCount; ++idx)
             {
                 var device = WaveOut.GetCapabilities(idx);
-                if (device.ProductName.Contains(VirtualCableDevice))
+                if (device.ProductName.Contains(AudioConstants.VirtualCableDevice))
                 {
                     outputDeviceVB.DeviceNumber = idx;
                     break;
