@@ -39,7 +39,7 @@ namespace PlaySound.Services
             });
         }
 
-        public void ShowError(string message, string title)
+        public void ShowError(string message, string title, MessageBoxImage icon = MessageBoxImage.Error)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -47,11 +47,11 @@ namespace PlaySound.Services
                     message,
                     title,
                     MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                    icon);
             });
         }
 
-        public void ShowInformation(string message, string title)
+        public void ShowInformation(string message, string title, MessageBoxImage icon = MessageBoxImage.Information)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
@@ -59,7 +59,7 @@ namespace PlaySound.Services
                     message,
                     title,
                     MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                    icon);
             });
         }
     }

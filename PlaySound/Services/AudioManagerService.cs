@@ -30,12 +30,25 @@ namespace PlaySound.Services
 
         public void InitializeHotKeys(IEnumerable<AudioDto> audioDtos)
         {
+            InitializeSoundLists();
+            RegisterDefaultHotKeys();
+            RegisterAudioHotKeys(audioDtos);
+        }
+
+        private void InitializeSoundLists()
+        {
             _soundsVB.Clear();
             _soundsDefault.Clear();
-            
+        }
+
+        private void RegisterDefaultHotKeys()
+        {
             _globalHotKeyService.UnregisterAllHotkeys();
             _globalHotKeyService.RegisterHotkey(ModifierKeys.Control, Key.End, StopAudio);
+        }
 
+        private void RegisterAudioHotKeys(IEnumerable<AudioDto> audioDtos)
+        {
             foreach (var audio in audioDtos)
             {
                 if (string.IsNullOrEmpty(audio.Path))

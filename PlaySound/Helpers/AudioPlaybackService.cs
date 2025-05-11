@@ -48,8 +48,20 @@ namespace PlaySound.Helpers
 
         private void InitializeDevices(int sampleRate, int channelCount)
         {
+            InitializeOutputDevices();
+            InitializeMixers(sampleRate, channelCount);
+            StartPlayback();
+        }
+
+        private void InitializeOutputDevices()
+        {
             outputDeviceDefault = new WaveOutEvent();
             outputDeviceVB = new WaveOutEvent();
+            FindAndSetVirtualCableDevice();
+        }
+
+        private void FindAndSetVirtualCableDevice()
+        {
             for (int idx = 0; idx < WaveOut.DeviceCount; ++idx)
             {
                 var device = WaveOut.GetCapabilities(idx);
@@ -59,12 +71,21 @@ namespace PlaySound.Helpers
                     break;
                 }
             }
-            mixerVB = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channelCount));
-            mixerDefault = new MixingSampleProvider(WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channelCount));
+        }
+
+        private void InitializeMixers(int sampleRate, int channelCount)
+        {
+            var waveFormat = WaveFormat.CreateIeeeFloatWaveFormat(sampleRate, channelCount);
+            mixerVB = new MixingSampleProvider(waveFormat);
+            mixerDefault = new MixingSampleProvider(waveFormat);
             mixerVB.ReadFully = true;
             mixerDefault.ReadFully = true;
             outputDeviceVB.Init(mixerVB);
             outputDeviceDefault.Init(mixerDefault);
+        }
+
+        private void StartPlayback()
+        {
             outputDeviceVB.Play();
             outputDeviceDefault.Play();
         }
