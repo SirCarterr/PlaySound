@@ -1,5 +1,6 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using PlaySound.Interfaces;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -12,7 +13,7 @@ namespace PlaySound.Services
             return Task.Run(() =>
             {
                 var dialog = new CommonOpenFileDialog();
-                return Application.Current.Dispatcher.Invoke(() =>
+                return InvokeOnUIThread(() =>
                 {
                     if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     {
@@ -27,7 +28,7 @@ namespace PlaySound.Services
         {
             return Task.Run(() =>
             {
-                return Application.Current.Dispatcher.Invoke(() =>
+                return InvokeOnUIThread(() =>
                 {
                     var result = MessageBox.Show(
                         message,
@@ -41,26 +42,34 @@ namespace PlaySound.Services
 
         public void ShowError(string message, string title, MessageBoxImage icon = MessageBoxImage.Error)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                MessageBox.Show(
-                    message,
-                    title,
-                    MessageBoxButton.OK,
-                    icon);
-            });
+            ShowMessageBox(message, title, MessageBoxButton.OK, icon);
         }
 
         public void ShowInformation(string message, string title, MessageBoxImage icon = MessageBoxImage.Information)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            ShowMessageBox(message, title, MessageBoxButton.OK, icon);
+        }
+
+        private void ShowMessageBox(string message, string title, MessageBoxButton buttons, MessageBoxImage icon)
+        {
+            InvokeOnUIThread(() =>
             {
                 MessageBox.Show(
                     message,
                     title,
-                    MessageBoxButton.OK,
+                    buttons,
                     icon);
             });
+        }
+
+        private T InvokeOnUIThread<T>(Func<T> action)
+        {
+            return Application.Current.Dispatcher.Invoke(action);
+        }
+
+        private void InvokeOnUIThread(Action action)
+        {
+            Application.Current.Dispatcher.Invoke(action);
         }
     }
 } 

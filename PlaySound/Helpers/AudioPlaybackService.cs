@@ -92,17 +92,11 @@ namespace PlaySound.Helpers
 
         private IWaveProvider ConvertToRightChannelCount(IWaveProvider input)
         {
-            if (input.WaveFormat.Channels == mixerVB.WaveFormat.Channels)
-            {
-                return input;
-            }
-
-            if (input.WaveFormat.Channels == 1 && mixerVB.WaveFormat.Channels == 2)
-            {
-                return new MonoToStereoProvider16(input);
-            }
-
-            throw new NotImplementedException("Not yet implemented this channel count conversion");
+            return input.WaveFormat.Channels == mixerVB.WaveFormat.Channels
+                ? input
+                : input.WaveFormat.Channels == 1 && mixerVB.WaveFormat.Channels == 2
+                    ? new MonoToStereoProvider16(input)
+                    : throw new NotImplementedException("Not yet implemented this channel count conversion");
         }
 
         protected virtual void Dispose(bool disposing)
