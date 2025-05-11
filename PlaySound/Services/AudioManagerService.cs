@@ -63,9 +63,7 @@ namespace PlaySound.Services
 
         public void PlayAudio(AudioDto audio)
         {
-            var soundVB = _soundsVB.First(s => s.Id == audio.Id);
-            var soundDefault = _soundsDefault.First(s => s.Id == audio.Id);
-
+            var (soundVB, soundDefault) = GetSoundsForAudio(audio.Id);
             _audioPlaybackService.PlaySoundVB(soundVB);
             _audioPlaybackService.PlaySoundDefault(soundDefault);
         }
@@ -77,18 +75,22 @@ namespace PlaySound.Services
 
         public void SetVolume(AudioDto audio, float volume)
         {
-            var soundVB = _soundsVB.First(s => s.Id == audio.Id);
-            var soundDefault = _soundsDefault.First(s => s.Id == audio.Id);
-
+            var (soundVB, soundDefault) = GetSoundsForAudio(audio.Id);
             soundVB.Volume = volume;
             soundDefault.Volume = volume;
         }
 
+        private (CachedSound soundVB, CachedSound soundDefault) GetSoundsForAudio(int audioId)
+        {
+            return (
+                _soundsVB.First(s => s.Id == audioId),
+                _soundsDefault.First(s => s.Id == audioId)
+            );
+        }
+
         private void PlayAudio(int Id)
         {
-            var soundVB = _soundsVB.First(s => s.Id == Id);
-            var soundDefault = _soundsDefault.First(s => s.Id == Id);
-
+            var (soundVB, soundDefault) = GetSoundsForAudio(Id);
             _audioPlaybackService.PlaySoundVB(soundVB);
             _audioPlaybackService.PlaySoundDefault(soundDefault);
         }
