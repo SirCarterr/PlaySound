@@ -30,10 +30,7 @@ namespace PlaySound.Model
             var enumerator = new MMDeviceEnumerator();
             
             var defaultPlaybackDevice = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            
-            int outRate = defaultPlaybackDevice.AudioClient.MixFormat.SampleRate;
-            
-            return new WaveFormat(outRate, audioFileReader.WaveFormat.Channels);
+            return new WaveFormat(defaultPlaybackDevice.AudioClient.MixFormat.SampleRate, audioFileReader.WaveFormat.Channels);
         }
 
         private static byte[] ReadAudioData(Mp3FileReader audioFileReader, WaveFormat outFormat)

@@ -4,6 +4,7 @@ using PlaySound.Model;
 using PlaySound.Repositories;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace PlaySound.Services
 {
@@ -45,15 +46,7 @@ namespace PlaySound.Services
         public async Task<IEnumerable<AudioDto>> GetAllAudios()
         {
             var audios = await _audioRepository.GetAllAudios();
-            
-            var audioDtos = new List<AudioDto>();
-            
-            foreach (var audio in audios)
-            {
-                audioDtos.Add(AudioConverter.ConvertToDTO(audio));
-            }
-            
-            return audioDtos;
+            return audios.Select(AudioConverter.ConvertToDTO);
         }
     }
 }
